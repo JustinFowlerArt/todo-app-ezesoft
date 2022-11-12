@@ -27,7 +27,7 @@ const config = {
             },
             {
                 test: /\.css$/,
-                use: ['style-loader', 'css-loader'],
+                use: ['style-loader', 'css-loader', 'postcss-loader'],
             },
         ],
     },
@@ -38,9 +38,9 @@ const config = {
             inject: 'body',
         }),
 
-        new CopyPlugin({
-            patterns: [{ from: 'src/images', to: 'images' }],
-        }),
+        // new CopyPlugin({
+        //     patterns: [{ from: 'src/images', to: 'images' }],
+        // }),
     ],
 };
 
