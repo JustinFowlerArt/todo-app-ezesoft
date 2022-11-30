@@ -12,6 +12,7 @@ export type iTodo = {
     type: number;
     deadline: Date;
     lastModified: Date;
+    [key: string]: boolean | number | string | Date
 };
 
 export type iLookup = {
@@ -41,21 +42,18 @@ export const TodoList = () => {
     });
 
     const itemsLeft = todos.filter(todo => !todo.complete).length;
-    const dayjs = require('dayjs');
 
     useEffect(() => {
-        const localTodos = localStorage.getItem('todos');
         if (firstRender) {
+            const localTodos = localStorage.getItem('todos');
             if (localTodos) {
                 setTodos(JSON.parse(localTodos));
             }
             setFirstRender(false);
+        } else {
+            localStorage.setItem('todos', JSON.stringify(todos));
         }
-    }, [firstRender]);
-
-    const updateLocal = (updatedTodos: iTodo[]) => {
-        localStorage.setItem('todos', JSON.stringify(updatedTodos));
-    };
+    }, [firstRender, todos]);
 
     const handleChange = (name: string) => {
         setNewTodo(name);
@@ -63,25 +61,16 @@ export const TodoList = () => {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const addedTodo: iTodo = {
-            id: todos.length + 1,
-            name: newTodo,
-            complete: false,
-            priority: 1,
-            type: 0,
-            deadline: new Date(),
-            lastModified: new Date(),
-        };
         setTodos([
             ...todos,
             {
-                ...addedTodo,
-            },
-        ]);
-        updateLocal([
-            ...todos,
-            {
-                ...addedTodo,
+                id: todos.length + 1,
+                name: newTodo,
+                complete: false,
+                priority: 1,
+                type: 0,
+                deadline: new Date(),
+                lastModified: new Date(),
             },
         ]);
         setNewTodo('');
@@ -95,24 +84,20 @@ export const TodoList = () => {
         const updatedTodos = [...todos];
         const todo = updatedTodos.find(todo => todo.id === id);
         if (todo) {
-            //@ts-ignore
             todo[attribute as keyof iTodo] = value;
             todo.lastModified = new Date();
         }
         setTodos(updatedTodos);
-        updateLocal(updatedTodos);
     };
 
     const handleDelete = (id: number) => {
         const updatedTodos = todos.filter(todo => todo.id !== id);
         setTodos(updatedTodos);
-        updateLocal(updatedTodos);
     };
 
     const handleDeleteCompleted = () => {
         const updatedTodos = todos.filter(todo => !todo.complete);
         setTodos(updatedTodos);
-        updateLocal(updatedTodos);
     };
 
     const handleLookup = (name: string, value: string) => {
@@ -122,11 +107,11 @@ export const TodoList = () => {
     const filterResults = () => {
         let results = todos;
         if (lookup.search) {
-            results = results.filter(todo => {
-                return todo.name
+            results = results.filter(todo => (
+                todo.name
                     .toLowerCase()
-                    .includes(lookup.search.toLowerCase());
-            });
+                    .includes(lookup.search.toLowerCase())
+            ));
         }
         if (lookup.status) {
             if (lookup.status === 'active') {

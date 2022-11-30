@@ -6,8 +6,6 @@ import App from './app';
 const root = ReactDOM.createRoot(document.getElementById('root') as Element);
 root.render(
     <StrictMode>
-        {/* <ErrorBoundary> */}
         <App />
-        {/* </ErrorBoundary> */}
     </StrictMode>
 );

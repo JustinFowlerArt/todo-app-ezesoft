@@ -20,7 +20,7 @@ export const FilterList = ({ lookup, handleLookup }: Props) => {
                     />
                 ))}
                 <Filter
-                        name={'Recent'}
+                        name='Recent'
                         lookup={lookup}
                         filter='timeframe'
                         handleLookup={handleLookup}
