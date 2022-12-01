@@ -11,7 +11,7 @@ export const Filter = ({ name, filter, lookup, handleLookup }: Props) => {
     return (
         <button
             className={`font-bold ${
-                lookup[filter as keyof iLookup] === name.toLowerCase()
+                lookup[filter] === name.toLowerCase()
                     ? 'text-bright-blue'
                     : 'text-light-gray-blue-300 hover:text-dark-gray-blue-300'
             }`}
@@ -19,7 +19,7 @@ export const Filter = ({ name, filter, lookup, handleLookup }: Props) => {
             onClick={e => {
                 handleLookup(
                     filter,
-                    e.currentTarget.value === lookup[filter as keyof iLookup] &&
+                    e.currentTarget.value === lookup[filter] &&
                         filter !== 'status'
                         ? ''
                         : e.currentTarget.value

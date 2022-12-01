@@ -4,6 +4,7 @@ import { Input } from './input';
 import { Search } from './search';
 import { Todo } from './todo';
 
+// Basic type definitions
 export type iTodo = {
     id: number;
     name: string;
@@ -12,7 +13,7 @@ export type iTodo = {
     type: number;
     deadline: Date;
     lastModified: Date;
-    [key: string]: boolean | number | string | Date
+    [key: string]: boolean | number | string | Date;
 };
 
 export type iLookup = {
@@ -21,8 +22,10 @@ export type iLookup = {
     priority: string;
     type: string;
     timeframe: string;
+    [key: string]: string;
 };
 
+// Todo attribute types used for filtering todo list
 export const todoTypes = ['Personal', 'Family', 'Health', 'Work'];
 export const todoPriorities = ['Low', 'Medium', 'High'];
 export const todoStatuses = ['All', 'Active', 'Completed'];
@@ -33,6 +36,9 @@ export const TodoList = () => {
     const [todos, setTodos] = useState<iTodo[]>([]);
     const [newTodo, setNewTodo] = useState('');
 
+    /**
+     * Attributes used to filter todo list
+     */
     const [lookup, setLookup] = useState<iLookup>({
         search: '',
         status: 'all',
@@ -41,8 +47,16 @@ export const TodoList = () => {
         timeframe: '',
     });
 
+    /**
+     * Number of incomplete todos
+     */
     const itemsLeft = todos.filter(todo => !todo.complete).length;
 
+    /**
+     * Check for todos in local storage on first render and update state if found.
+     * Sync local storage any time todos change.
+     * This is currently fragile without proper error handling.
+     */
     useEffect(() => {
         if (firstRender) {
             const localTodos = localStorage.getItem('todos');
@@ -55,10 +69,17 @@ export const TodoList = () => {
         }
     }, [firstRender, todos]);
 
+    /**
+     * Update local state for new todo name.
+     */
     const handleChange = (name: string) => {
         setNewTodo(name);
     };
 
+    /**
+     * Creates new todo named from NewTodo input field with all other attributes at default.
+     * Resets NewTodo input field.
+     */
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setTodos([
@@ -76,6 +97,12 @@ export const TodoList = () => {
         setNewTodo('');
     };
 
+    /**
+     * Handles updating individual todo attributes.
+     * @param id id of todo to be updated
+     * @param attribute name of attribute to be updated
+     * @param value property to assign to attribute to be updated
+     */
     const handleUpdate = (
         id: number,
         attribute: string,
@@ -84,34 +111,47 @@ export const TodoList = () => {
         const updatedTodos = [...todos];
         const todo = updatedTodos.find(todo => todo.id === id);
         if (todo) {
-            todo[attribute as keyof iTodo] = value;
+            todo[attribute] = value;
             todo.lastModified = new Date();
         }
         setTodos(updatedTodos);
     };
 
+    /**
+     * Delete individual todo based on id.
+     */
     const handleDelete = (id: number) => {
         const updatedTodos = todos.filter(todo => todo.id !== id);
         setTodos(updatedTodos);
     };
 
+    /**
+     * Removes all todos that have been marked as complete.
+     */
     const handleDeleteCompleted = () => {
         const updatedTodos = todos.filter(todo => !todo.complete);
         setTodos(updatedTodos);
     };
 
+    /**
+     * Updates lookup state to use in todo filtering.
+     */
     const handleLookup = (name: string, value: string) => {
         setLookup({ ...lookup, [name]: value });
     };
 
+    /**
+     * Filters results consecutively based on all lookup state attributes that are not empty.
+     * This can be cleaned up but works for prototyping. Has performance implications for large datasets.
+     * Likely candidate for Underscore or Lodash.
+     * @returns filtered array of todos
+     */
     const filterResults = () => {
         let results = todos;
         if (lookup.search) {
-            results = results.filter(todo => (
-                todo.name
-                    .toLowerCase()
-                    .includes(lookup.search.toLowerCase())
-            ));
+            results = results.filter(todo =>
+                todo.name.toLowerCase().includes(lookup.search.toLowerCase())
+            );
         }
         if (lookup.status) {
             if (lookup.status === 'active') {

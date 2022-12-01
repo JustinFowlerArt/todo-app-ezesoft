@@ -9,11 +9,11 @@ export default function useClickedOutside(
 
 	useEffect(() => {
 		const checkIfClickedOutside = (
-			e: React.ChangeEvent<HTMLInputElement> | MouseEvent
+			e: MouseEvent
 		) => {
 			// If getter is true and the clicked target is not within the div,
 			// then flip the boolean
-			if (getter && ref.current && !ref.current.contains(e.target as Node)) {
+			if (getter && ref.current && e.target instanceof Node && !ref.current.contains(e.target)) {
 				setter(false);
 				if (callback) {
 					callback();

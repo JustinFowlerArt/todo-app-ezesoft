@@ -19,19 +19,21 @@ export const Todo = ({ todo, handleDelete, handleUpdate }: Props) => {
     dayjs.extend(relativeTime);
 
     const [renaming, setRenaming] = useState(false);
-    const [updated, setUpdated] = useState(false);
     const [newName, setNewName] = useState(todo.name);
 
+    /**
+     * Update local state for todo name.
+     */
     const handleChange = (name: string) => {
         setNewName(name);
     };
 
-    const toggleUpdated = () => {
-        handleUpdate(todo.id, 'name', newName);
-        setUpdated(!updated);
-    };
-
-    const ref = useClickedOutside(renaming, setRenaming, toggleUpdated);
+    /**
+     * Update todo name and set renaming to false if clicked outside of renamed todo div.
+     */
+    const ref = useClickedOutside(renaming, setRenaming, () =>
+        handleUpdate(todo.id, 'name', newName)
+    );
 
     return (
         <div className='relative flex flex-col px-6 border-b border:light-gray-blue-200'>
@@ -114,6 +116,7 @@ export const Todo = ({ todo, handleDelete, handleUpdate }: Props) => {
                         )
                     }
                     className={`py-1 px-2 rounded bg-light-gray-blue-100 ${
+                        // Plan to replace nested ternary operator
                         todo.priority === 0
                             ? 'bg-blue-300'
                             : todo.priority === 1
